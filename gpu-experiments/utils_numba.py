@@ -116,28 +116,6 @@ def eval_newton_polynomial(
     - :math:`N`: the number of query (evaluation) points
     - :math:`\mathrm{nr_polynomials}`: the number of polynomials with different
       coefficient sets of the same multi-index set
-
-    :param xx: numpy array with coordinates of points where polynomial is to be evaluated.
-              The shape has to be ``(k x m)``.
-    :param exponents: numpy array with exponents for the polynomial. The shape has to be ``(N x m)``.
-    :param generating_points: generating points used to generate the grid. The shape is ``(n x m)``.
-    :param max_exponents: array with maximum exponent in each dimension. The shape has to be ``m``.
-    :param products_placeholder: a numpy array for storing the (chained) products.
-    :param monomials_placeholder: placeholder numpy array where the results of evaluation are stored.
-                               The shape has to be ``(k x p)``.
-    :param triangular: whether the output will be of lower triangular form or not.
-                       -> will skip the evaluation of some values
-    :return: the value of each Newton polynomial at each point. The shape will be ``(k x N)``.
-
-    Notes
-    -----
-    - This is a Numba-accelerated function.
-    - The memory footprint for evaluating the Newton monomials iteratively
-       with a single query point at a time is smaller than evaluating all
-       the Newton monomials on all query points.
-       However, when multiplied with multiple coefficient sets,
-       this approach will be faster.
-    - Results are stored in the placeholder arrays. The function returns None.
     """
     # Total number of query points (N)
     n_points = xx.shape[0]
@@ -172,7 +150,7 @@ def eval_newton_driver_numba_cpu(
     exponents: np.ndarray,
     generating_points: np.ndarray,
 ):
-    """Evaluate the polynomial(s) in Newton form at multiple query points.
+    """Numba compiled driver function to evaluate a polynomial in Newton form.
 
     Iterative implementation of polynomial evaluation in Newton form
 
@@ -185,52 +163,6 @@ def eval_newton_driver_numba_cpu(
         - ``N`` = amount of coefficients
         - ``k`` = amount of points
         - ``p`` = amount of polynomials
-
-
-    .. todo::
-        - idea for improvement: make use of the sparsity of the exponent matrix and avoid iterating over the zero entries!
-        - refac the explanation and documentation of this function.
-        - use instances of :class:`MultiIndex` and/or :class:`Grid` instead of the array representations of them.
-        - ship this to the submodule ``newton_polynomials``.
-
-    :param xx: Arguemnt array with shape ``(m, k)`` the ``k`` points to evaluate on with dimensionality ``m``.
-    :type xx: np.ndarray
-    :param coefficients: The coefficients of the Newton polynomials.
-        NOTE: format fixed such that 'lagrange2newton' conversion matrices can be passed
-        as the Newton coefficients of all Lagrange monomials of a polynomial without prior transponation
-    :type coefficients: np.ndarray, shape = (N, p)
-    :param exponents: a multi index ``alpha`` for every Newton polynomial corresponding to the exponents of this ``monomial``
-    :type exponents: np.ndarray, shape = (m, N)
-    :param generating_points: Grid values for every dimension (e.g. Leja ordered Chebychev values).
-        the values determining the locations of the hyperplanes of the interpolation grid.
-        the ordering of the values determine the spacial distribution of interpolation nodes.
-        (relevant for the approximation properties and the numerical stability).
-    :type generating_points: np.ndarray, shape = (m, n+1)
-    :param verify_input: weather the data types of the input should be checked. turned off by default for speed.
-    :type verify_input: bool, optional
-    :param batch_size: batch size of query points
-    :type batch_size: int, optional
-
-    :raise TypeError: If the input ``generating_points`` do not have ``dtype = float``.
-
-    :return: (k, p) the value of each input polynomial at each point. TODO squeezed into the expected shape (1D if possible). Notice, format fixed such that the regression can use the result as transformation matrix without transponation
-
-    Notes
-    -----
-    - This method is faster than the recursive implementation of ``tree.eval_lp(...)`` for a single point and a single polynomial (1 set of coeffs):
-        - time complexity: :math:`O(mn+mN) = O(m(n+N)) = ...`
-        - pre-computations: :math:`O(mn)`
-        - evaluation: :math:`O(mN)`
-        - space complexity: :math:`O(mn)` (precomputing and storing the products)
-        - evaluation: :math:`O(0)`
-    - advantage:
-        - just operating on numpy arrays, can be just-in-time (jit) compiled
-        - can evaluate multiple polynomials without recomputing all intermediary results
-
-    See Also
-    --------
-    evaluate_multiple : ``numba`` accelerated implementation which is called internally by this function.
-    convert_eval_output: ``numba`` accelerated implementation of the output converter.
     """
 
     N, m_1 = exponents.shape
