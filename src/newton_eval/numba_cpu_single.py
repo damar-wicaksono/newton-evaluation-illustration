@@ -1,7 +1,7 @@
 import numba
 import numpy as np
 
-from numba import njit, void, range
+from numba import njit, void
 
 INT_DTYPE = np.int_
 FLOAT_DTYPE = np.float_
