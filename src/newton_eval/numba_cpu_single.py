@@ -14,7 +14,7 @@ INT = numba.from_dtype(INT_DTYPE)
 I_1D = INT[:]
 I_2D = INT[:, :]
 
-__all__ = ["eval_driver_numba_cpu_par"]
+__all__ = ["eval_driver_numba_cpu_single"]
 
 
 @njit(void(F_1D, I_2D, F_2D, I_1D, F_2D, F_1D), cache=True)  # O(Nm)
