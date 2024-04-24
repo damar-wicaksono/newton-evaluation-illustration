@@ -15,6 +15,11 @@ from .numba_cpu_par import *
 
 __all__ += numba_cpu_par.__all__
 
+from . import numba_cpu_single
+from .numba_cpu_single import *
+
+__all__ += numba_cpu_single.__all__
+
 from . import numba_gpu
 from .numba_gpu import *
 
