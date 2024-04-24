@@ -150,7 +150,7 @@ def eval_newton_polynomial(
         )
 
 
-def eval_driver_numba_cpu_par(
+def eval_driver_numba_cpu_single(
     xx: np.ndarray,
     coefficients: np.ndarray,
     exponents: np.ndarray,
