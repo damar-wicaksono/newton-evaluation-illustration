@@ -24,3 +24,13 @@ from . import numba_gpu
 from .numba_gpu import *
 
 __all__ += numba_gpu.__all__
+
+from . import numba_gpu_splits
+from .numba_gpu_splits import *
+
+__all__ += numba_gpu_splits.__all__
+
+from . import numba_gpu_splits_rev
+from .numba_gpu_splits_rev import *
+
+__all__ += numba_gpu_splits_rev.__all__

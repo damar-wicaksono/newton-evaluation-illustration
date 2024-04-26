@@ -18,7 +18,7 @@ I_2D = INT[:, :]
 __all__ = ["eval_driver_numba_gpu_splits"]
 
 
-@cuda.jit(device=True)
+@cuda.jit(device=True, inline=True, lineinfo=True)
 def compute_newton_monomial(
     x_single: np.ndarray,
     exponent_single: np.ndarray,
@@ -52,7 +52,7 @@ def compute_newton_monomial(
     return tmp
 
 
-@cuda.jit
+@cuda.jit(inline=True, lineinfo=True)
 def eval_newton_polynomial(
     xx: np.ndarray,
     exponents: np.ndarray,
@@ -110,7 +110,6 @@ def eval_driver_numba_gpu_splits(
     chunk = int(N / splits)
 
     # Start the kernel
-
     for i in range(splits):
         start = np.array([i*chunk], dtype=np.int32)
         end = np.array([(i + 1)*chunk], dtype=np.int32)

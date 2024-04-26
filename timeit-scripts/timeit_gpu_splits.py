@@ -12,7 +12,7 @@ if __name__ == "__main__":
     SETUP_CODE = \
         f"import minterpy as mp\n" \
         f"import numpy as np\n" \
-        f"from newton_eval import eval_driver_numba_gpu\n" \
+        f"from newton_eval import eval_driver_numba_gpu_splits\n" \
         f"spatial_dimension = 4\n" \
         f"poly_degree = {poly_degree}\n"\
         f"mi = mp.MultiIndexSet.from_degree(spatial_dimension, poly_degree, 2.0)\n" \
@@ -21,11 +21,11 @@ if __name__ == "__main__":
         f"exponents = mi.exponents\n" \
         f"grd = mp.Grid(mi)\n" \
         f"gen_points = grd.generating_points\n" \
-        f"yy_numba_gpu = eval_driver_numba_gpu(xx_test[:5], nwt_coeffs, exponents, gen_points, {splits})\n" \
+        f"yy_numba_gpu = eval_driver_numba_gpu_splits(xx_test[:5], nwt_coeffs, exponents, gen_points, 256, splits={splits})\n" \
 
     n_reps = 5
     n_loops = 2
-    t = timeit.Timer(f"eval_driver_numba_gpu(xx_test, nwt_coeffs, exponents, gen_points, {splits})", setup=SETUP_CODE).repeat(n_reps, n_loops)
+    t = timeit.Timer(f"eval_driver_numba_gpu_splits(xx_test, nwt_coeffs, exponents, gen_points, splits={splits})", setup=SETUP_CODE).repeat(n_reps, n_loops)
 
     t_best = np.min(t) / n_loops
     t_worst = np.max(t) / n_loops

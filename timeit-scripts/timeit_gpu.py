@@ -2,15 +2,19 @@ import numpy as np
 import minterpy as mp
 import timeit
 import datetime
+import sys
 
 if __name__ == "__main__":
+
+    poly_degree = int(sys.argv[-1])
 
     SETUP_CODE = \
         f"import minterpy as mp\n" \
         f"import numpy as np\n" \
         f"from newton_eval import eval_driver_numba_gpu\n" \
         f"spatial_dimension = 4\n" \
-        f"mi = mp.MultiIndexSet.from_degree(spatial_dimension, 45, 2.0)\n" \
+        f"poly_degree = {poly_degree}\n"\
+        f"mi = mp.MultiIndexSet.from_degree(spatial_dimension, poly_degree, 2.0)\n" \
         f"xx_test = -1 + 2 * np.random.rand(1000000, spatial_dimension)\n" \
         f"nwt_coeffs = np.random.rand(len(mi))\n" \
         f"exponents = mi.exponents\n" \
@@ -18,7 +22,7 @@ if __name__ == "__main__":
         f"gen_points = grd.generating_points\n" \
         f"yy_numba_gpu = eval_driver_numba_gpu(xx_test[:5], nwt_coeffs, exponents, gen_points)\n" \
 
-    n_reps = 7
+    n_reps = 5
     n_loops = 2
     t = timeit.Timer(f"eval_driver_numba_gpu(xx_test, nwt_coeffs, exponents, gen_points)", setup=SETUP_CODE).repeat(n_reps, n_loops)
 
@@ -30,4 +34,4 @@ if __name__ == "__main__":
     current_datetime = datetime.datetime.now()
     timestamp = current_datetime.timestamp()
 
-    np.savetxt(f"/p/home/jusers/wicaksono1/jureca/gpu-timing-{timestamp}.txt", t_summary)
+    np.savetxt(f"/p/home/jusers/wicaksono1/jureca/results/gpu-timing-degree-{poly_degree}-{timestamp}.txt", t_summary)
